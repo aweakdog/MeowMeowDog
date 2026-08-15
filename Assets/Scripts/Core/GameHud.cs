@@ -29,7 +29,7 @@ namespace MeowMeowDog.Core
             var ctrl = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.UpperRight, fontSize = 13 };
             if (_cjkFont != null) ctrl.font = _cjkFont;
             GUI.Label(new Rect(Screen.width - 330, 10, 320, 80),
-                "WASD 移动｜空格 跳跃（喵喵可二段跳）\nE 互动｜水里：空格上浮 / Shift 下潜", ctrl);
+                "WASD 移动｜空格 跳跃（喵喵可二段跳）\nE 互动｜水里：空格上浮 / Shift 下潜\nEsc 暂停菜单", ctrl);
 
             // 任务引导（下方居中）
             var hint = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 18, fontStyle = FontStyle.Bold };

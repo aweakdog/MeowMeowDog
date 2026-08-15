@@ -40,6 +40,7 @@ namespace MeowMeowDog.EditorTools
             var playerPrefab = CreatePlayerPrefab();
             CreateMainScene(playerPrefab);
             AddAlwaysIncludedShaders();
+            ConfigurePlayerSettings();
 
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             AssetDatabase.SaveAssets();
@@ -127,6 +128,16 @@ namespace MeowMeowDog.EditorTools
             lsGo.AddComponent<LevelState>();
 
             EditorSceneManager.SaveScene(scene, ScenePath);
+        }
+
+        /// <summary>窗口化启动 + 可调大小，游戏里也有 Esc 暂停菜单可退出。</summary>
+        static void ConfigurePlayerSettings()
+        {
+            PlayerSettings.productName = "MeowMeowDog";
+            PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
+            PlayerSettings.defaultScreenWidth = 1440;
+            PlayerSettings.defaultScreenHeight = 900;
+            PlayerSettings.resizableWindow = true;
         }
 
         /// <summary>

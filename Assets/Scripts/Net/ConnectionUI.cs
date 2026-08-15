@@ -17,6 +17,7 @@ namespace MeowMeowDog.Net
         string _joinIp = "127.0.0.1";
         string _status = "";
         string _lanIp = "127.0.0.1";
+        bool _paused;
         Font _cjkFont;
 
         void Start()
@@ -59,6 +60,20 @@ namespace MeowMeowDog.Net
             }
         }
 
+        void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Escape)) _paused = !_paused;
+        }
+
+        static void QuitGame()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
         static string GetLanIp()
         {
             try
@@ -81,8 +96,10 @@ namespace MeowMeowDog.Net
             if (nm.IsClient || nm.IsServer)
             {
                 DrawInGamePanel(nm);
+                if (_paused) DrawPauseMenu(nm);
                 return;
             }
+            _paused = false;
 
             // ---- 主菜单 ----
             float w = 340, h = 320;
@@ -116,8 +133,43 @@ namespace MeowMeowDog.Net
             GUILayout.Label($"本机局域网 IP：{_lanIp}（告诉对方用这个加入）");
             if (!string.IsNullOrEmpty(_status)) GUILayout.Label(_status);
 
+            GUILayout.Space(8);
+            if (GUILayout.Button("退出游戏", GUILayout.Height(30)))
+                QuitGame();
+
             GUILayout.EndVertical();
             GUILayout.Space(30);
+            GUILayout.EndHorizontal();
+            GUILayout.EndArea();
+        }
+
+        void DrawPauseMenu(NetworkManager nm)
+        {
+            float w = 260, h = 230;
+            var rect = new Rect((Screen.width - w) / 2, (Screen.height - h) / 2, w, h);
+            GUI.Box(rect, "");
+            GUILayout.BeginArea(rect);
+            GUILayout.Space(12);
+            var title = new GUIStyle(GUI.skin.label) { fontSize = 20, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold };
+            if (_cjkFont != null) title.font = _cjkFont;
+            GUILayout.Label("暂停", title);
+            GUILayout.Space(8);
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(24);
+            GUILayout.BeginVertical();
+            if (GUILayout.Button("继续游戏", GUILayout.Height(38))) _paused = false;
+            GUILayout.Space(8);
+            if (GUILayout.Button("离开房间", GUILayout.Height(38)))
+            {
+                nm.Shutdown();
+                _paused = false;
+                _status = "";
+            }
+            GUILayout.Space(8);
+            if (GUILayout.Button("退出游戏", GUILayout.Height(38)))
+                QuitGame();
+            GUILayout.EndVertical();
+            GUILayout.Space(24);
             GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }
