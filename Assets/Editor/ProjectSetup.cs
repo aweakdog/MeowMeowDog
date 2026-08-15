@@ -106,11 +106,13 @@ namespace MeowMeowDog.EditorTools
             var nmGo = new GameObject("NetworkManager");
             var nm = nmGo.AddComponent<NetworkManager>();
             var utp = nmGo.AddComponent<UnityTransport>();
+            // EnableSceneManagement 必须开：场景内置的 NetworkObject（LevelState）
+            // 依赖 NGO 场景同步才会在客户端 spawn（冒烟测试验证过关闭时不同步）
             nm.NetworkConfig = new NetworkConfig
             {
                 NetworkTransport = utp,
                 PlayerPrefab = playerPrefab,
-                EnableSceneManagement = false,
+                EnableSceneManagement = true,
             };
 
             // ---- 游戏逻辑 ----
@@ -127,7 +129,11 @@ namespace MeowMeowDog.EditorTools
             EditorSceneManager.SaveScene(scene, ScenePath);
         }
 
-        /// <summary>把运行时用 Shader.Find 引用的着色器加入 Always Included，保证打包后正常。</summary>
+        /// <summary>
+        /// 把运行时用 Shader.Find 引用的 Standard 加入 Always Included，保证打包后不丢材质。
+        /// 注意：不能加 "GUI/Text Shader" 之类 HideFlags.DontSave 的编辑器内部着色器，
+        /// 会导致打包时写 unity_builtin_extra 失败（它们本来就随播放器内置，无需显式包含）。
+        /// </summary>
         static void AddAlwaysIncludedShaders()
         {
             var gs = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset").FirstOrDefault();
@@ -136,17 +142,23 @@ namespace MeowMeowDog.EditorTools
             var arr = so.FindProperty("m_AlwaysIncludedShaders");
             if (arr == null) return;
 
-            foreach (var name in new[] { "Standard", "GUI/Text Shader" })
+            // 清除会破坏打包的 DontSaveInBuild 着色器条目（修复历史写入）
+            for (int i = arr.arraySize - 1; i >= 0; i--)
             {
-                var shader = Shader.Find(name);
-                if (shader == null) continue;
-                bool exists = Enumerable.Range(0, arr.arraySize)
-                    .Any(i => arr.GetArrayElementAtIndex(i).objectReferenceValue == shader);
-                if (!exists)
+                var obj = arr.GetArrayElementAtIndex(i).objectReferenceValue;
+                if (obj != null && (obj.hideFlags & HideFlags.DontSaveInBuild) != 0)
                 {
-                    arr.InsertArrayElementAtIndex(arr.arraySize);
-                    arr.GetArrayElementAtIndex(arr.arraySize - 1).objectReferenceValue = shader;
+                    Debug.Log($"[MMDog] 从 Always Included Shaders 移除不可打包的 {obj.name}");
+                    arr.DeleteArrayElementAtIndex(i);
                 }
+            }
+
+            var standard = Shader.Find("Standard");
+            if (standard != null && !Enumerable.Range(0, arr.arraySize)
+                    .Any(i => arr.GetArrayElementAtIndex(i).objectReferenceValue == standard))
+            {
+                arr.InsertArrayElementAtIndex(arr.arraySize);
+                arr.GetArrayElementAtIndex(arr.arraySize - 1).objectReferenceValue = standard;
             }
             so.ApplyModifiedProperties();
         }

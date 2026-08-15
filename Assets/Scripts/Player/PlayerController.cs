@@ -38,6 +38,7 @@ namespace MeowMeowDog.Player
 
         public override void OnNetworkSpawn()
         {
+            Debug.Log($"[MMDog] Player spawned owner={OwnerClientId} isDog={IsDog} isLocal={IsOwner} pos={transform.position}");
             _avatar.Build(IsDog);
             NetSwimming.OnValueChanged += (_, swim) => _avatar.SetSwimming(swim);
             _avatar.SetSwimming(NetSwimming.Value);

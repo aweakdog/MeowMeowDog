@@ -25,6 +25,7 @@ namespace MeowMeowDog.Level
 
         public override void OnNetworkSpawn()
         {
+            Debug.Log($"[MMDog] LevelState spawned, isServer={IsServer}");
             var lb = LevelBuilder.Instance;
             if (IsServer)
             {

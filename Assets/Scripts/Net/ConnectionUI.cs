@@ -25,6 +25,22 @@ namespace MeowMeowDog.Net
             _lanIp = GetLanIp();
             var nm = NetworkManager.Singleton;
             nm.OnClientDisconnectCallback += OnClientDisconnect;
+            nm.OnClientConnectedCallback += id => Debug.Log($"[MMDog] client connected: {id}, total={(nm.IsServer ? nm.ConnectedClientsIds.Count : -1)}");
+
+            // 命令行自动联机（自动化测试/快速开发用）：-autohost 或 -autojoin [ip]
+            // 注意：NGO 场景同步会在客户端连接时重载场景，Start 会再次执行，所以要防重入
+            if (nm.IsClient || nm.IsServer) return;
+            var args = System.Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == "-autohost") { Debug.Log("[MMDog] autohost"); StartHost(); }
+                else if (args[i] == "-autojoin")
+                {
+                    if (i + 1 < args.Length && !args[i + 1].StartsWith("-")) _joinIp = args[i + 1];
+                    Debug.Log($"[MMDog] autojoin {_joinIp}");
+                    StartClient();
+                }
+            }
         }
 
         void OnDestroy()

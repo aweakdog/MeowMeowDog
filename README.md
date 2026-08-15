@@ -64,6 +64,25 @@ prompts/                        # 设计想法记录
 
 **协作注意**：首次打开 Unity 后会生成 `Assets/**/*.meta`、`Packages/packages-lock.json` 和 `ProjectSettings/` 下的配置文件——这些都要一起提交（`.gitignore` 已配置好，`git add -A` 即可）。两个人要用同一个 Unity 版本。
 
+## 开发者命令（可选）
+
+```bash
+U="/Applications/Unity/Hub/Editor/6000.3.22f1/Unity.app/Contents/MacOS/Unity"
+
+# 重新生成场景/Prefab（改了 ProjectSetup 后用）
+"$U" -projectPath . -batchmode -quit -executeMethod MeowMeowDog.EditorTools.ProjectSetup.Run -logFile /tmp/setup.log
+
+# 命令行打包（输出 Builds/MeowMeowDog.app，注意不能加 -nographics）
+"$U" -projectPath . -batchmode -executeMethod MeowMeowDog.EditorTools.BuildScript.BuildMac -buildPath Builds/MeowMeowDog.app -logFile /tmp/build.log
+
+# 联机冒烟测试：起两个无头实例互连，看日志里的 [MMDog] 标记
+BIN=Builds/MeowMeowDog.app/Contents/MacOS/MeowMeowDog
+"$BIN" -batchmode -nographics -autohost -logFile /tmp/host.log &
+"$BIN" -batchmode -nographics -autojoin 127.0.0.1 -logFile /tmp/client.log &
+```
+
+单机双人自测最方便的方式：编辑器点 Play 当 Host，再开 `Builds/MeowMeowDog.app` 输入 `127.0.0.1` 加入。
+
 ## 路线图（对应 prompts/1.idea）
 
 - [x] 第一关：推箱 / 二段跳 / 变鱼游泳 / 双人机关（局域网联机）
