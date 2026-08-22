@@ -52,6 +52,10 @@
 ```
 Assets/
   Editor/ProjectSetup.cs        # 一键生成场景/Prefab 的编辑器脚本
+  Editor/ModelSetup.cs          # 模型导入配置 + 生成角色 AnimatorController
+  Resources/
+    Models/  Dog/Cat/Piranha 动画模型（Quaternius CC0 动物包）
+    Anim/    自动生成的 AnimatorController
   Scripts/
     Core/    CameraRig, GameHud  # 相机跟随、任务提示 HUD
     Net/     ConnectionUI, ClientNetworkTransform  # 联机菜单、位置同步
@@ -86,8 +90,14 @@ BIN=Builds/MeowMeowDog.app/Contents/MacOS/MeowMeowDog
 ## 路线图（对应 prompts/1.idea）
 
 - [x] 第一关：推箱 / 二段跳 / 变鱼游泳 / 双人机关（局域网联机）
+- [x] 正式美术模型替换几何体占位（Quaternius CC0 动物包，带骨骼动画）
 - [ ] 公网联机（Unity Relay + 房间码，不用同一 WiFi）
 - [ ] 夜晚场景：蝙蝠侠狗狗 & 罗宾猫咪造型和夜间能力
 - [ ] 第二关起的连续剧情 + 每关不同主题能力
-- [ ] 正式美术模型替换几何体占位
 - [ ] 音效和背景音乐
+
+## 美术素材
+
+角色模型来自 [Quaternius](https://quaternius.com/) 的 Animal Pack Vol.2（CC0 公版权，免署名）：
+狗狗、猫猫带 Idle/Walking 动画，食人鱼带 Swimming/Bite 动画（水下变身狗狗鱼/猫猫鱼，按角色染色区分）。
+新增 FBX 放到 `Assets/Resources/Models/` 后，菜单 `MeowMeowDog → 生成角色 AnimatorController` 会自动生成对应控制器。

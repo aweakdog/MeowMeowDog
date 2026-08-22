@@ -37,6 +37,7 @@ namespace MeowMeowDog.EditorTools
             Directory.CreateDirectory("Assets/Scenes");
             Directory.CreateDirectory("Assets/Prefabs");
 
+            ModelSetup.CreateAnimatorControllers();
             var playerPrefab = CreatePlayerPrefab();
             CreateMainScene(playerPrefab);
             AddAlwaysIncludedShaders();
